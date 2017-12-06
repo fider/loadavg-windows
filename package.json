@@ -1,0 +1,30 @@
+{
+   "name": "loadavg-windows",
+   "version": "1.0.0",
+   "description": "Plain JS os.loadavg for Windows, that Node do not supports",
+   "main": "index.js",
+   "directories": {
+      "src": "src",
+      "test": "test"
+   },
+   "scripts": {
+      "test": "node --expose-gc test/test-loadavg-windows.js"
+   },
+   "repository": {
+      "type": "git",
+      "url": "TODO"
+   },
+   "keywords": [
+      "loadavg",
+      "windows"
+   ],
+   "dependencies": {
+      "weak-daemon": "1.0.0"
+   },
+   "__comment": "TODO Fider - include npm dependencies before publish",
+   "devDependencies": {
+      "weak-daemon": "file:../weak-daemon"
+   },
+   "author": "Wojciech Fiderek",
+   "license": "ISC"
+}
