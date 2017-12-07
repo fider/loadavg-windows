@@ -4,7 +4,7 @@
    "description": "Plain JS os.loadavg for Windows, that Node do not supports",
    "main": "index.js",
    "directories": {
-      "src": "src",
+      "src": "lib",
       "test": "test"
    },
    "scripts": {
@@ -12,13 +12,13 @@
    },
    "repository": {
       "type": "git",
-      "url": "TODO"
+      "url": "https://github.com/fider/loadavg-windows/"
    },
    "keywords": [
       "loadavg",
       "windows"
    ],
-   "dependencies": {
+   "__dependencies": {
       "weak-daemon": "1.0.0"
    },
    "__comment": "TODO Fider - include npm dependencies before publish",

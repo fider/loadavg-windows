@@ -1,9 +1,9 @@
 const os = require('os');
 const process = require('process');
 
-const CpuT = require('./src/CpuT').CpuT;
-const CpuTimes = require('./src/CpuTimes').CpuTimes;
-const LoadavgWindows = require('LoadavgWindows').LoadavgWindows;
+const CpuT = require('./lib/cput').CpuT;
+const CpuTimes = require('./lib/cpu-times').CpuTimes;
+const LoadavgWindows = require('./lib/loadavg-windows').LoadavgWindows;
 
 
 

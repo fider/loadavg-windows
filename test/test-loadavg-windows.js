@@ -150,7 +150,10 @@ test().then(
     }
 );
 
-const inspect = require('util').inspect;
+const util = require('util');
+function inspect(obj) {
+    return util.inspect(obj, {depth:null});
+}
 
 // `main` test function
 async function test() {
@@ -464,6 +467,7 @@ async function test() {
         assert( isResultAsExpected(load_avg, false, false, false), `load_avg:${inspect(load_avg)}`);
         
         time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
+        busyWaitMs(100);
         await sleepMs(9);
     }
     
@@ -480,7 +484,8 @@ async function test() {
         assert( isResultAsExpected(load_avg, true, false, false),  `load_avg:${inspect(load_avg)} \n ${inspect(lw)}`);
         
         time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
-        await sleepMs(9);
+        busyWaitMs(100);
+        await sleepMs(49);
     }
     
     await sleepMs(2*TEST__SAMPLING_INTERVAL);
@@ -496,7 +501,8 @@ async function test() {
         assert( isResultAsExpected(load_avg, true, true, false),   `load_avg:${inspect(load_avg)}`);
         
         time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
-        await sleepMs(9);
+        busyWaitMs(100);
+        await sleepMs(49);
     }
     
     await sleepMs(2*TEST__SAMPLING_INTERVAL);
@@ -509,10 +515,11 @@ async function test() {
         assert( isMaxOneSamplesOlderThan(samples, time_limit),     `cput_samples:${inspect(samples)} \n time_limit:${time_limit}`);
         assert( haveSamplesNonDescValues(samples),                 `cput_samples:${inspect(samples)}`);
         assert( areSamplesSorted(samples),                         `cput_samples:${inspect(samples)}`);
-        assert( isResultAsExpected(load_avg, true, true, true),    `load_avg:${inspect(load_avg)}`);
+        assert( isResultAsExpected(load_avg, true, true, true),    `load_avg:${inspect(load_avg)} \n loadavg_windows:${inspect(lw)}`);
         
         time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
-        await sleepMs(9);
+        busyWaitMs(100);
+        await sleepMs(49);
     }
 
     // TODO Fider - uncomment for real test - and server live test comapre between native linux and this sw solution
