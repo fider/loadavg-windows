@@ -452,75 +452,75 @@ async function test() {
     
 
 
-    stopwatch = new Stopwatch();
-    stopwatch.start();
-    time_limit = 0;
-    
-    // Before 1 min
-    while( stopwatch.time < TEST__LOADAVG_PERIOD_0 ) {
-        let load_avg = lw.loadavg();
-        let samples  = lw._cpu_times._cput_samples;
-        
-        assert( isMaxOneSamplesOlderThan(samples, time_limit),     `cput_samples:${inspect(samples)} \n time_limit:${time_limit}`);
-        assert( haveSamplesNonDescValues(samples),                 `cput_samples:${inspect(samples)}`);
-        assert( areSamplesSorted(samples),                         `cput_samples:${inspect(samples)}`);
-        assert( isResultAsExpected(load_avg, false, false, false), `load_avg:${inspect(load_avg)}`);
-        
-        time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
-        busyWaitMs(100);
-        await sleepMs(9);
-    }
-    
-    await sleepMs(2*TEST__SAMPLING_INTERVAL);
-    
-    // Before 5 min
-    while( stopwatch.time < TEST__LOADAVG_PERIOD_1) {
-        let load_avg = lw.loadavg();
-        let samples  = lw._cpu_times._cput_samples;
-        
-        assert( isMaxOneSamplesOlderThan(samples, time_limit),     `cput_samples:${inspect(samples)} \n time_limit:${time_limit}`);
-        assert( haveSamplesNonDescValues(samples),                 `cput_samples:${inspect(samples)}`);
-        assert( areSamplesSorted(samples),                         `cput_samples:${inspect(samples)}`);
-        assert( isResultAsExpected(load_avg, true, false, false),  `load_avg:${inspect(load_avg)} \n ${inspect(lw)}`);
-        
-        time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
-        busyWaitMs(100);
-        await sleepMs(49);
-    }
-    
-    await sleepMs(2*TEST__SAMPLING_INTERVAL);
-
-    // Before 15 min
-    while( stopwatch.time < TEST__LOADAVG_PERIOD_2) {
-        let load_avg = lw.loadavg();
-        let samples  = lw._cpu_times._cput_samples;
-        
-        assert( isMaxOneSamplesOlderThan(samples, time_limit),     `cput_samples:${inspect(samples)} \n time_limit:${time_limit}`);
-        assert( haveSamplesNonDescValues(samples),                 `cput_samples:${inspect(samples)}`);
-        assert( areSamplesSorted(samples),                         `cput_samples:${inspect(samples)}`);
-        assert( isResultAsExpected(load_avg, true, true, false),   `load_avg:${inspect(load_avg)}`);
-        
-        time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
-        busyWaitMs(100);
-        await sleepMs(49);
-    }
-    
-    await sleepMs(2*TEST__SAMPLING_INTERVAL);
-    
-    // After 15 min
-    while( stopwatch.time < 3*TEST__LOADAVG_PERIOD_2) {
-        let load_avg = lw.loadavg();
-        let samples  = lw._cpu_times._cput_samples;
-        
-        assert( isMaxOneSamplesOlderThan(samples, time_limit),     `cput_samples:${inspect(samples)} \n time_limit:${time_limit}`);
-        assert( haveSamplesNonDescValues(samples),                 `cput_samples:${inspect(samples)}`);
-        assert( areSamplesSorted(samples),                         `cput_samples:${inspect(samples)}`);
-        assert( isResultAsExpected(load_avg, true, true, true),    `load_avg:${inspect(load_avg)} \n loadavg_windows:${inspect(lw)}`);
-        
-        time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
-        busyWaitMs(100);
-        await sleepMs(49);
-    }
+//    stopwatch = new Stopwatch();
+//    stopwatch.start();
+//    time_limit = 0;
+//    
+//    // Before 1 min
+//    while( stopwatch.time < TEST__LOADAVG_PERIOD_0 ) {
+//        let load_avg = lw.loadavg();
+//        let samples  = lw._cpu_times._cput_samples;
+//        
+//        assert( isMaxOneSamplesOlderThan(samples, time_limit),     `cput_samples:${inspect(samples)} \n time_limit:${time_limit}`);
+//        assert( haveSamplesNonDescValues(samples),                 `cput_samples:${inspect(samples)}`);
+//        assert( areSamplesSorted(samples),                         `cput_samples:${inspect(samples)}`);
+//        assert( isResultAsExpected(load_avg, false, false, false), `load_avg:${inspect(load_avg)}`);
+//        
+//        time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
+//        busyWaitMs(100);
+//        await sleepMs(9);
+//    }
+//    
+//    await sleepMs(2*TEST__SAMPLING_INTERVAL);
+//    
+//    // Before 5 min
+//    while( stopwatch.time < TEST__LOADAVG_PERIOD_1) {
+//        let load_avg = lw.loadavg();
+//        let samples  = lw._cpu_times._cput_samples;
+//        
+//        assert( isMaxOneSamplesOlderThan(samples, time_limit),     `cput_samples:${inspect(samples)} \n time_limit:${time_limit}`);
+//        assert( haveSamplesNonDescValues(samples),                 `cput_samples:${inspect(samples)}`);
+//        assert( areSamplesSorted(samples),                         `cput_samples:${inspect(samples)}`);
+//        assert( isResultAsExpected(load_avg, true, false, false),  `load_avg:${inspect(load_avg)} \n ${inspect(lw)}`);
+//        
+//        time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
+//        busyWaitMs(100);
+//        await sleepMs(49);
+//    }
+//    
+//    await sleepMs(2*TEST__SAMPLING_INTERVAL);
+//
+//    // Before 15 min
+//    while( stopwatch.time < TEST__LOADAVG_PERIOD_2) {
+//        let load_avg = lw.loadavg();
+//        let samples  = lw._cpu_times._cput_samples;
+//        
+//        assert( isMaxOneSamplesOlderThan(samples, time_limit),     `cput_samples:${inspect(samples)} \n time_limit:${time_limit}`);
+//        assert( haveSamplesNonDescValues(samples),                 `cput_samples:${inspect(samples)}`);
+//        assert( areSamplesSorted(samples),                         `cput_samples:${inspect(samples)}`);
+//        assert( isResultAsExpected(load_avg, true, true, false),   `load_avg:${inspect(load_avg)}`);
+//        
+//        time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
+//        busyWaitMs(100);
+//        await sleepMs(49);
+//    }
+//    
+//    await sleepMs(2*TEST__SAMPLING_INTERVAL);
+//    
+//    // After 15 min
+//    while( stopwatch.time < 3*TEST__LOADAVG_PERIOD_2) {
+//        let load_avg = lw.loadavg();
+//        let samples  = lw._cpu_times._cput_samples;
+//        
+//        assert( isMaxOneSamplesOlderThan(samples, time_limit),     `cput_samples:${inspect(samples)} \n time_limit:${time_limit}`);
+//        assert( haveSamplesNonDescValues(samples),                 `cput_samples:${inspect(samples)}`);
+//        assert( areSamplesSorted(samples),                         `cput_samples:${inspect(samples)}`);
+//        assert( isResultAsExpected(load_avg, true, true, true),    `load_avg:${inspect(load_avg)} \n loadavg_windows:${inspect(lw)}`);
+//        
+//        time_limit = Date.now() - TEST__MIN_SAMPLE_AGE;
+//        busyWaitMs(100);
+//        await sleepMs(49);
+//    }
 
     
 }
