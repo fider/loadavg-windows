@@ -8,7 +8,7 @@
       "test": "test"
    },
    "scripts": {
-      "test": "node --expose-gc test/test-loadavg-windows.js"
+      "test": "jasmine"
    },
    "repository": {
       "type": "git",
@@ -18,10 +18,12 @@
       "loadavg",
       "windows"
    ],
-   "__dependencies": {
+   "devDependencies": {
+      "weak-daemon": "file:../weak-daemon"
+   },
+   "dependencies": {
       "weak-daemon": "<2.0.0"
    },
-   
    "author": "Wojciech Fiderek",
    "license": "MIT"
 }
