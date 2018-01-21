@@ -88,7 +88,9 @@ class CpuTimesMock extends MethodMock {
 
 
     set(total, busy) {
-        while(total && busy) {
+        this.zero();
+
+        while(total || busy) {
             let total_part = Math.ceil(total/2);
             let busy_part = Math.ceil(busy/2);
             this._addToRandomCpu(total_part, busy_part);
@@ -103,19 +105,19 @@ class CpuTimesMock extends MethodMock {
         let times = this._cpus[ this._current_cpu ].times;
 
 
-        times.idle = total - busy;
+        times.idle += total - busy;
 
         let busy_left = busy;
-        times.user = Math.ceil(busy_left/2);
+        times.user += Math.ceil(busy_left/2);
         busy_left -= times.user;
 
-        times.nice = Math.ceil(busy_left/2);
+        times.nice += Math.ceil(busy_left/2);
         busy_left -= times.nice;
 
-        times.sys = Math.ceil(busy_left/2);
+        times.sys += Math.ceil(busy_left/2);
         busy_left -= times.sys;
 
-        times.irq = busy_left;
+        times.irq += busy_left;
         
 
         this._current_cpu = (this._current_cpu + 1) % this._cpus.length;
