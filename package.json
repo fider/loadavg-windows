@@ -22,7 +22,7 @@
       "jasmine": "^2.9.0",
       "weak-daemon": "file:../weak-daemon"
    },
-   "dependencies": {
+   "__dependencies": {
       "weak-daemon": "<2.0.0"
    },
    "author": "Wojciech Fiderek",

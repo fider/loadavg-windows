@@ -1,13 +1,14 @@
 const {CpuT} = require('../lib/cput');
 
-const {now, cputimes:times} = mocks;
+const {now, times} = MOCKS;
+
 
 
 describe('CpuT', function() {
 
     beforeAll(function() {
-        now.init();
-        times.init();
+        now.mock();
+        times.mock();
     });
 
     afterAll(function() {

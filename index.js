@@ -1,9 +1,9 @@
 const os = require('os');
 const process = require('process');
 
-const CpuT = require('./lib/cput').CpuT;
-const CpuTimes = require('./lib/cpu-times').CpuTimes;
-const LoadavgWindows = require('./lib/loadavg-windows').LoadavgWindows;
+const {CpuT} = require('./lib/cput');
+const {CpuTimes} = require('./lib/cpu-times');
+const {LoadavgWindows} = require('./lib/loadavg-windows');
 
 
 
@@ -13,7 +13,7 @@ if(process.env.NODE_ENV === 'production') {
 
 
 
-if (os.platform() === 'win32'  &&  process.env.NODE_ENV !== 'test') {
+if (os.platform() === 'win32') {
     console.log('[loadavg-windows] Using platform-independent loadavg implementation.');
     
     const loadavg_windows = new LoadavgWindows();
@@ -22,11 +22,6 @@ if (os.platform() === 'win32'  &&  process.env.NODE_ENV !== 'test') {
     
     os.loadavg = loadavg;
     exports.loadavg = loadavg;
+} else {
+    exports.loadavg = os.loadavg;
 }
-
-
-
-// Exposed for test purposes
-exports.CpuT = CpuT;
-exports.CpuTimes = CpuTimes;
-exports.LoadavgWindows = LoadavgWindows;
