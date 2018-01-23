@@ -4,7 +4,6 @@
     "test-*.js"
   ],
   "helpers": [
-    "../lib/*.js",
     "helpers/**/*.js"
   ],
   "stopSpecOnExpectationFailure": false,

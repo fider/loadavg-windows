@@ -1,30 +1,30 @@
 {
-   "name": "loadavg-windows",
-   "version": "1.0.0",
-   "description": "Plain JS os.loadavg for Windows (currently not supported natively in Node.js)",
-   "main": "index.js",
-   "directories": {
-      "src": "lib",
-      "test": "test"
-   },
-   "scripts": {
-      "test": "jasmine"
-   },
-   "repository": {
-      "type": "git",
-      "url": "https://github.com/fider/loadavg-windows/"
-   },
-   "keywords": [
-      "loadavg",
-      "windows"
-   ],
-   "devDependencies": {
-      "jasmine": "^2.9.0",
-      "weak-daemon": "file:../weak-daemon"
-   },
-   "__dependencies": {
-      "weak-daemon": "<2.0.0"
-   },
-   "author": "Wojciech Fiderek",
-   "license": "MIT"
+  "name": "loadavg-windows",
+  "version": "1.0.0",
+  "description": "Plain JS os.loadavg for Windows (currently not supported natively in Node.js)",
+  "main": "lib/index.js",
+  "directories": {
+    "src": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jasmine JASMINE_CONFIG_PATH=jasmine.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fider/loadavg-windows/"
+  },
+  "keywords": [
+    "loadavg",
+    "windows"
+  ],
+  "devDependencies": {
+    "jasmine": "^2.9.0",
+    "weak-daemon": "file:../weak-daemon"
+  },
+  "__dependencies": {
+    "weak-daemon": "<2.0.0"
+  },
+  "author": "Wojciech Fiderek",
+  "license": "MIT"
 }
