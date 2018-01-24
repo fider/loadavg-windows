@@ -1,14 +1,14 @@
-const {MockMethod} = require('./mock-method');
+// const {MockMethod} = require('./mock-method');
+const {ok} = require('assert');
 const os = require('os');
 
 
 
-class MockCpuTimes extends MockMethod {
+class MockCpuTimes {
     constructor() {
-        super();
-
         // Members
         this._cpus = [];
+        this._nativeCpus = os.cpus;
 
         // Data init
         let cpus = os.cpus();
@@ -25,19 +25,10 @@ class MockCpuTimes extends MockMethod {
                 }
             }
         }
-        this._current_cpu = 0;
+        this._cpu_no = 0;
     }
 
-    mock() {
-        super.mock(os, 'cpus', this, this.cpus);
-        this.zero();
-    }
-
-    cpus() {
-        return this._cpus;
-    }
-
-
+    
     zero() {
         for(let cpu of this._cpus) {
             cpu.times = {
@@ -51,7 +42,96 @@ class MockCpuTimes extends MockMethod {
     }
 
 
+
+    busy(millis) {
+        this._mock();
+        this.zero();
+        this._addBusy(millis);
+
+        return {
+            idle: this._addIdle.bind(this)
+        }
+    }    
+
+    idle(millis) {
+        this._mock();
+        this.zero();
+        this._addIdle(millis);
+
+        return {
+            busy: this._addBusy.bind(this)
+        }
+    }
+
+
+
+    _addIdle(millis) {
+        let parts = this._splitToRandomParts(millis);
+        parts.forEach( (part) => {
+            this._addIdleToRandomCpu(part);
+        });
+    }
+
+    _addBusy(millis) {
+        let parts = this._splitToRandomParts(millis);
+        parts.forEach( (part) => {
+            this._addBusyToRandomCpu(part);
+        });
+    }
+
+
+    _addIdleToRandomCpu(millis) {
+        let cpu = this._cpus[ this._rand(0, os.cpus().length-1) ];
+        cpu.times.idle += millis;
+    }
+
+
+    _addBusyToRandomCpu(millis) {
+        let t = this._cpus[ this._rand(0, os.cpus().length-1) ].times;
+
+        let left = millis;
+
+        let part = Math.ceil( left / this._rand(1, 5) );
+        left -= part;
+        t.user += part;
+
+        part = Math.ceil( left / this._rand(1, 5) );
+        left -= part;
+        t.nice += part;
+
+        part = Math.ceil( left / this._rand(1, 5) );
+        left -= part;
+        t.sys += part;
+
+        t.irq = left;
+    }
+
+    
+    _rand(from, to) {
+        ok(from<to, `Invalid random args. From:${from} to:${to}`);
+
+        let range = to - from + 1;
+
+        return Math.floor( Math.random() * range ) + from;
+    }
+
+    _splitToRandomParts(num) {
+        let parts = [];
+
+        while(num) {
+            let rand = this._rand(1, 4);
+            let part = Math.ceil(num/rand);
+
+            parts.push(part);
+            num -= part;
+        }
+
+        return parts;
+    }
+
+
     set(total, busy) {
+        this._mock();
         this.zero();
 
         let idle = total - busy;
@@ -68,33 +148,47 @@ class MockCpuTimes extends MockMethod {
 
 
     _addToRandomCpu(idle, busy) {        
-        let times = this._cpus[ this._current_cpu ].times;
+        let cpu_times = this._cpus[ this._cpu_no ].times;
         let add = 0;
 
 
-        times.idle += idle;
+        cpu_times.idle += idle;
 
         let busy_left = busy;
 
         add = Math.ceil(busy_left/2);
-        times.user += add;
+        cpu_times.user += add;
         busy_left -= add;
 
         add = Math.ceil(busy_left/2);
-        times.nice += add;
+        cpu_times.nice += add;
         busy_left -= add;
 
         add = Math.ceil(busy_left/2);
-        times.sys += add;
+        cpu_times.sys += add;
         busy_left -= add;
 
-        times.irq += busy_left;
+        cpu_times.irq += busy_left;
         
 
-        this._current_cpu = (this._current_cpu + 1) % this._cpus.length;
+        this._cpu_no = (this._cpu_no + 1) % this._cpus.length;
+    }
+
+
+    reset() {
+        os.cpus = this._nativeCpus;
+    }
+
+    _mock() {
+        os.cpus = this._cpusMock.bind(this);
+    }
+
+
+    _cpusMock() {
+        return this._cpus;
     }
 }
 
 
 
-module.exports.cputimes = new MockCpuTimes();
+module.exports.cpu = new MockCpuTimes();

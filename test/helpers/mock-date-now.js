@@ -2,40 +2,97 @@ const {MockMethod} = require('./mock-method');
 const {ok} = require('assert');
 
 
-class MockDateNow extends MockMethod {
+
+
+
+class MockDateNow {
     constructor() {
-        super();
-
-        this._now = 0;
+        this._nativeDate = global.Date;
+        this._timestamp = 0;
     }
 
-    mock() {
-        super.mock(Date, 'now', this, this._mockedNow);
-    }
+    /* --- Mocked methods --- */
     
-    _mockedNow() {
-        return this._now;
+    now() {
+        return this._timestamp;
     }
 
-    set(timestamp) {
-        ok(typeof timestamp === 'number');
+    // no more Date methods needs to be
 
-        this._now = timestamp;
+
+    
+    /* --- Mock controllers --- */
+
+    get add() {
+        this._mock();
+        
+        return {
+            min: this.addMin.bind(this),
+            sec: this.addSec.bind(this),
+            ms: this.addMs.bind(this)
+        }
     }
 
-    setMinSec(minutes, seconds) {
-        ok(typeof minutes === 'number');
-        ok(typeof seconds === 'number');
 
-        this._now = minutes*60000 + seconds*1000;
+    min(minutes) {
+        this._mock();
+        this._timestamp = minutes * 60000;
+
+        return {
+            sec: this.addSec.bind(this),
+            ms: this.addMs.bind(this)
+        };
     }
 
-    setMin(minutes) {
-        ok(typeof minutes === 'number');
+    addMin(minutes) {
+        this._mock();
+        this._timestamp += minutes * 60000;
 
-        this._now = minutes*60000;
+        return {
+            sec: this.addSec.bind(this),
+            ms: this.addMs.bind(this)
+        };
+    }
+
+
+    sec(seconds) {
+        this._mock();
+        this._timestamp = seconds * 1000;
+
+        return {
+            ms: this.addMs.bind(this)
+        };
+    }
+
+    addSec(seconds) {
+        this._mock();
+        this._timestamp += seconds * 1000;
+
+        return {
+            ms: this.addMs.bind(this)
+        };
+    }
+
+
+    ms(millis) {
+        this._mock();
+        this._timestamp = millis;
+    }
+
+    addMs(millis) {   
+        this._mock();     
+        this._timestamp += millis;
+    }
+
+
+    reset() {
+        global.Date = this._nativeDate;
+        this._timestamp = 0;
+    }
+
+    _mock() {
+        global.Date = this;
     }
 }
 
-
-module.exports.now = new MockDateNow();
+module.exports.time = new MockDateNow();

@@ -17,10 +17,6 @@ class MockMethod {
         ok( typeof mock_func === 'function' );
 
 
-        if( this._origin_obj || this._origin_func || this._origin_func_name ) {
-            throw new Error(`function '${this._origin_func.name}' already mocked as '${this._origin_func_name}'`);
-        }
-
         this._origin_obj = target_obj;
         this._origin_func_name = func_name;
         this._origin_func = target_obj[func_name];

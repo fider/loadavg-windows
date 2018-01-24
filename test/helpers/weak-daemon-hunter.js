@@ -45,6 +45,7 @@ class WeakDaemonHunter extends MockMethod {
     }
 
     stopHunting() {
+        this._errorIfNotCaptured();
         this._weak_daemon = null;
         super.reset();
     }
