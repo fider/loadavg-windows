@@ -5,7 +5,7 @@ const WeakDaemon = weak_daemon_native.getClass();
 
 
 
-class StubWeakDaemon extends WeakDaemon {
+class MockWeakDaemon extends WeakDaemon {
     
     constructor() {
         super(...arguments);
@@ -59,7 +59,7 @@ class WeakDaemonHunter extends MockMethod {
     
     _captureInstance() {
         this._errorIfAlreadyCaptured();
-        this._weak_daemon = new StubWeakDaemon(...arguments);
+        this._weak_daemon = new MockWeakDaemon(...arguments);
         return this._weak_daemon;
     };
 

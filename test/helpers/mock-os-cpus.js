@@ -67,6 +67,7 @@ class MockCpuTimes {
 
     _addIdle(millis) {
         let parts = this._splitToRandomParts(millis);
+
         parts.forEach( (part) => {
             this._addIdleToRandomCpu(part);
         });
@@ -74,6 +75,7 @@ class MockCpuTimes {
 
     _addBusy(millis) {
         let parts = this._splitToRandomParts(millis);
+        
         parts.forEach( (part) => {
             this._addBusyToRandomCpu(part);
         });
@@ -103,7 +105,7 @@ class MockCpuTimes {
         left -= part;
         t.sys += part;
 
-        t.irq = left;
+        t.irq += left;
     }
 
     
@@ -130,51 +132,7 @@ class MockCpuTimes {
     }
 
 
-    set(total, busy) {
-        this._mock();
-        this.zero();
-
-        let idle = total - busy;
-
-        while(idle || busy) {
-            let idle_part = Math.ceil(idle/2);
-            let busy_part = Math.ceil(busy/2);
-            this._addToRandomCpu(idle_part, busy_part);
-
-            busy = Math.max(0, busy - busy_part);
-            idle = Math.max(0, idle - idle_part);
-        }
-    }
-
-
-    _addToRandomCpu(idle, busy) {        
-        let cpu_times = this._cpus[ this._cpu_no ].times;
-        let add = 0;
-
-
-        cpu_times.idle += idle;
-
-        let busy_left = busy;
-
-        add = Math.ceil(busy_left/2);
-        cpu_times.user += add;
-        busy_left -= add;
-
-        add = Math.ceil(busy_left/2);
-        cpu_times.nice += add;
-        busy_left -= add;
-
-        add = Math.ceil(busy_left/2);
-        cpu_times.sys += add;
-        busy_left -= add;
-
-        cpu_times.irq += busy_left;
-        
-
-        this._cpu_no = (this._cpu_no + 1) % this._cpus.length;
-    }
-
-
+    
     reset() {
         os.cpus = this._nativeCpus;
     }
