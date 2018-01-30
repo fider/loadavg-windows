@@ -7,7 +7,7 @@ const {ok} = require('assert');
 
 class MockDateNow {
     constructor() {
-        this._nativeDate = global.Date;
+        this._nativeDateNow = global.Date.now;
         this._timestamp = 0;
     }
 
@@ -86,12 +86,12 @@ class MockDateNow {
 
 
     reset() {
-        global.Date = this._nativeDate;
+        global.Date.now = this._nativeDateNow;
         this._timestamp = 0;
     }
 
     _mock() {
-        global.Date = this;
+        global.Date.now = this.now.bind(this);
     }
 }
 

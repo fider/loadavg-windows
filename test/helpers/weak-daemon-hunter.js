@@ -27,7 +27,7 @@ class MockWeakDaemon extends WeakDaemon {
         return this._started;
     }
 
-    trigger() {
+    tick() {
         this._routine();
     }
 }
@@ -84,7 +84,7 @@ class WeakDaemonHunter extends MockMethod {
                 4) call "hunter.stopHunting()"
 
                 If succed then you can:
-                - call "${this.constructor.name}.trigger()" to call routine assigned to captured weak daemon instance
+                - call "${this.constructor.name}.tick()" to call routine assigned to captured weak daemon instance
                 - to get captured instance: "last_instance = ${this.constructor.name}.get()"
                 `);
         }

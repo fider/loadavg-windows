@@ -49,7 +49,8 @@ class MockCpuTimes {
         this._addBusy(millis);
 
         return {
-            idle: this._addIdle.bind(this)
+            idle: this._addIdle.bind(this),
+            total:this._addTotal.bind(this, {busy:millis})
         }
     }    
 
@@ -59,7 +60,8 @@ class MockCpuTimes {
         this._addIdle(millis);
 
         return {
-            busy: this._addBusy.bind(this)
+            busy: this._addBusy.bind(this),
+            total:this._addTotal.bind(this, {idle:millis})
         }
     }
 
@@ -79,6 +81,23 @@ class MockCpuTimes {
         parts.forEach( (part) => {
             this._addBusyToRandomCpu(part);
         });
+    }
+
+
+    _addTotal({busy, idle} = {busy:0, idle:0}, total) {
+        if( (busy && idle)
+                ||
+            ( ! (busy || idle) )
+        ) {
+            throw new Error('Internal mock error');
+        }
+
+
+        if(busy) {
+            this._addIdle( total-busy );
+        } else if(idle) {
+            this._addBusy( total-idle );
+        }
     }
 
 
