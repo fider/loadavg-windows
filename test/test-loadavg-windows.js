@@ -137,12 +137,12 @@ describe('Unit test LoadavgWindows ->', function() {
         // 0% load case
         let time_ago = 90;
 
-        current_cpu_t.timestamp =100;
-        current_cpu_t.total = 200;
+        current_cpu_t.timestamp = 100;
+        current_cpu_t.total = 300;
         current_cpu_t.busy = 30
         
         estimated_cpu_t.timestamp = current_cpu_t.timestamp - time_ago;
-        estimated_cpu_t.total = 300;
+        estimated_cpu_t.total = 200;
         estimated_cpu_t.busy = 30;
 
         let load = loadavg_windows._loadavg(current_cpu_t, time_ago);

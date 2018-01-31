@@ -1,5 +1,6 @@
 const os = require('os');
 const nativeLoadavg = os.loadavg;
+const ok = require('assert');
 const {inspect:insp} = require('util');
 const CPUS_LEN = os.cpus().length;
 
@@ -81,63 +82,51 @@ describe('loadavg-windows platform support test', function() {
 
 
 
-describe('LoadavgWindows', function() {
+describe('LoadavgWindows module test', function() {
 
     let weak_daemon = null;
     let loadavg_win = null;
 
 
-    /**
-     *   '// 0.3'  - is total cpus load basing on surrounding samples
-     */
-    const SAMPLES = [
-        {minutes:  100,  busy:  100,  total:  1000}, // loaded in first step
-        // 0.1
-        {minutes: 101,  busy:  200,  total:  2000}, 
-        // 0.6
-        {minutes: 102,  busy:  800,  total:  3000},
-        // 0.4
-        {minutes: 103,  busy: 1200,  total:  4000},
-        // 0.1
-        {minutes: 104,  busy: 1300,  total:  5000},
-        // 0.9
-        {minutes: 105,  busy: 2200,  total:  6000},
-        // 1
-        {minutes: 106,  busy: 3200,  total:  7000},
-        // 0.2
-        {minutes: 107,  busy: 3400,  total:  8000},
-        // 0.8
-        {minutes: 108,  busy: 4200,  total:  9000},
-        // 0.6
-        {minutes: 109,  busy: 4800,  total: 10000},
-        // 0.5
-        {minutes: 110,  busy: 5300,  total: 11000},
-        // 0.4
-        {minutes: 111,  busy: 5700,  total: 12000},
-        // 0.3
-        {minutes: 112,  busy: 6000,  total: 13000},
-        // 0.2
-        {minutes: 113,  busy: 6200,  total: 14000},
-        // 1
-        {minutes: 114,  busy: 7200,  total: 15000},
-        // 0.9
-        {minutes: 115,  busy: 8100,  total: 16000},
-        // 0.3
-        {minutes: 116,  busy: 8400,  total: 17000}
+    const CPU_DATA = [
+        {minutes: 100,  busy:  100,  total:  1000,  load: [0,   0, 0] },
+        {minutes: 101,  busy:  200,  total:  2000,  load: [0.1, 0, 0] },
+        {minutes: 102,  busy:  800,  total:  3000,  load: [0.6, 0, 0] },
+        {minutes: 103,  busy: 1200,  total:  4000,  load: [0.4, 0, 0] },
+        {minutes: 104,  busy: 1300,  total:  5000,  load: [0.1, 0, 0] },
+
+        {minutes: 105,  busy: 2200,  total:  6000,  load: [0.9, 0.42, 0] },
+        {minutes: 106,  busy: 3200,  total:  7000,  load: [1,   0.6,  0] },
+        {minutes: 107,  busy: 3400,  total:  8000,  load: [0.2, 0.52, 0] },
+        {minutes: 108,  busy: 4200,  total:  9000,  load: [0.8, 0.6,  0] },
+        {minutes: 109,  busy: 4800,  total: 10000,  load: [0.6, 0.7,  0] },
+
+        {minutes: 110,  busy: 5300,  total: 11000,  load: [0.5, 0.62, 0] },
+        {minutes: 111,  busy: 5700,  total: 12000,  load: [0.4, 0.5,  0] },
+        {minutes: 112,  busy: 6000,  total: 13000,  load: [0.3, 0.52, 0] },
+        {minutes: 113,  busy: 6200,  total: 14000,  load: [0.2, 0.4,  0] },
+        {minutes: 114,  busy: 7200,  total: 15000,  load: [1,   0.48, 0] },
+
+        {minutes: 115,  busy: 8100,  total: 16000,  load: [0.9, 0.56, 0.5325] },
+        {minutes: 116,  busy: 8400,  total: 17000,  load: [0.3, 0.54, 0.545] }
     ];
+
+    CPU_DATA.forEach( sample => {
+        sample.load = sample.load.map( load => parseInt(100 * load * CPUS_LEN)/100 );
+    });
 
     
     let prev_sample_num = 0;
 
     function loadSample(sample_num) {
-        if( (prev_sample_num+1 != sample_num)  ||  (sample_num >= SAMPLES.length) ) {
+        if( (prev_sample_num+1 != sample_num)  ||  (sample_num >= CPU_DATA.length) ) {
             throw new Error(`'Test code' error - incorrect data loaded.
                 prev_sample_num:${prev_sample_num}
                 n:${sample_num}
             `);
         }
 
-        const {minutes, busy, total} = SAMPLES[sample_num];
+        const {minutes, busy, total} = CPU_DATA[sample_num];
         time.min(minutes);
         cpu.busy(busy).total(total);
         weak_daemon.tick();
@@ -146,18 +135,9 @@ describe('LoadavgWindows', function() {
     }
 
 
-    function loadAt(period) {
-        if(period < 1 || period >= SAMPLES.length) {
-            throw new Error(`'Test code' error. 'period'=${period} out of bounds`);
-        }
-
-        let prev = period - 1;
-        let curr = period;
-
-        const {total: prev_total, busy: prev_busy } = SAMPLES[prev];
-        const {total: curr_total, busy: curr_busy } = SAMPLES[curr];
-
-        
+    function computeLoad(busy, total) {
+        ok(busy <= total, `Invalid input. BUSY=${busy} should be <= TOTAL=${total}`);
+        return parseInt( 100 * CPUS_LEN * (busy/total) ) / 100;
     }
 
 
@@ -171,7 +151,7 @@ describe('LoadavgWindows', function() {
         latest_log.mock();        
         weak_daemon_hunter.startHunting();
 
-        let {minutes, busy, total} = SAMPLES[0];
+        let {minutes, busy, total} = CPU_DATA[0];
         time.min(minutes);
         cpu.busy(busy).total(total);
 
@@ -205,8 +185,6 @@ describe('LoadavgWindows', function() {
 
 
     it('initialization test', function() {
-        // Alerady initilized with {100min, 0s total:1000, busy:200}
-        
         // Same test should be done while testing class LoadavgWindows
         const ONE_MINUTE = 60000;
         
@@ -220,95 +198,118 @@ describe('LoadavgWindows', function() {
 
 
 
-    it('test before first sample', function() {
-        time.min( SAMPLES[0].minutes ).sec(59);
+    it('runtime simulation', function() {
+
+        time.min( CPU_DATA[0].minutes ).sec(59);
         let result = os.loadavg();
-
-        expect(result).toEqual([0,0,0]);
-    });
+        expect(result).toEqual(CPU_DATA[0].load);
 
 
-
-    it('test with samples loading', function() {
 
         loadSample(1);
         result = os.loadavg();
-        expect(result).toEqual([  0.1*CPUS_LEN  ,0,0]);
+        expect(result).toEqual(CPU_DATA[1].load);
 
         loadSample(2);
         result = os.loadavg();
-        expect(result).toEqual([ 0.6*CPUS_LEN, 0, 0]);
+        expect(result).toEqual(CPU_DATA[2].load);
+
+
+
+        time.min(CPU_DATA[2].minutes).sec(15);
+        cpu.busy(900).total(3150);
+        let result_0 = computeLoad(550, 900);
+        result = os.loadavg();
+        expect(result).toEqual([result_0, 0, 0]);
 
 
 
         loadSample(3);
         result = os.loadavg();
-        expect(result).toEqual([  0.4*CPUS_LEN, 0,0]);
+        expect(result).toEqual(CPU_DATA[3].load);
 
         loadSample(4);
         result = os.loadavg();
-        expect(result).toEqual([  0.1*CPUS_LEN  ,0,0]);
+        expect(result).toEqual(CPU_DATA[4].load);
 
 
 
         loadSample(5);
         result = os.loadavg();
-        expect(result).toEqual([  0.9*CPUS_LEN, 0.42*CPUS_LEN, 0]);
+        expect(result).toEqual(CPU_DATA[5].load);
 
         loadSample(6);
         result = os.loadavg();
-        expect(result).toEqual([  1*CPUS_LEN, 0.6*CPUS_LEN, 0]);
+        expect(result).toEqual(CPU_DATA[6].load);
 
 
 
         loadSample(7);
         result = os.loadavg();
-        expect(result).toEqual([  0.2*CPUS_LEN,0.52*CPUS_LEN, 0]);
+        expect(result).toEqual(CPU_DATA[7].load);
 
         loadSample(8);
         result = os.loadavg();
-        expect(result).toEqual([  0.8*CPUS_LEN  ,0.6*CPUS_LEN,0]);
+        expect(result).toEqual(CPU_DATA[8].load);
 
 
 
         loadSample(9);
         result = os.loadavg();
-        expect(result).toEqual([  0.6*CPUS_LEN  ,0.7*CPUS_LEN,0]);
-
+        expect(result).toEqual(CPU_DATA[9].load);
+         
         loadSample(10);
         result = os.loadavg();
-        expect(result).toEqual([  0.5*CPUS_LEN  ,0.62*CPUS_LEN,0]);
+        expect(result).toEqual(CPU_DATA[10].load);
+
+        
+        
+        time.min(CPU_DATA[10].minutes).sec(48);
+        cpu.busy(5310).total(11160);
+        result_0 = computeLoad(110, 360);
+        let result_1 = computeLoad(2310, 4360);
+        result = os.loadavg();
+        expect(result).toEqual([result_0, result_1, 0]);
 
 
 
         loadSample(11);
         result = os.loadavg();
-        expect(result).toEqual([  0.4*CPUS_LEN  ,0.5*CPUS_LEN,0]);
+        expect(result).toEqual(CPU_DATA[11].load);
 
         loadSample(12);
         result = os.loadavg();
-        expect(result).toEqual([  0.3*CPUS_LEN  ,0.52*CPUS_LEN,0]);
+        expect(result).toEqual(CPU_DATA[12].load);
 
 
 
         loadSample(13);
         result = os.loadavg();
-        expect(result).toEqual([  0.2*CPUS_LEN  ,0.4*CPUS_LEN,0]);
+        expect(result).toEqual(CPU_DATA[13].load);
 
         loadSample(14);
         result = os.loadavg();
-        expect(result).toEqual([  1*CPUS_LEN  ,0.48*CPUS_LEN,0]);
+        expect(result).toEqual(CPU_DATA[14].load);
 
 
 
         loadSample(15);
         result = os.loadavg();
-        expect(result).toEqual([  0.9*CPUS_LEN  ,0.56*CPUS_LEN, 0.5325*CPUS_LEN]);
+        expect(result).toEqual(CPU_DATA[15].load);
         
         loadSample(16);
         result = os.loadavg();
-        expect(result).toEqual([  0.3*CPUS_LEN  ,0.54*CPUS_LEN, 0.545*CPUS_LEN]);
-        // 75% of 3-rd period + load between 4-th period and current
+        expect(result).toEqual(CPU_DATA[16].load);
+
+        
+
+        time.min(CPU_DATA[16].minutes).sec(36);
+        cpu.busy(8520).total(17920);
+        result_0 = computeLoad(240, 1320);
+        result_1 = computeLoad(2640, 5320);
+        let result_2 = computeLoad(7960, 15320);
+        result = os.loadavg();
+        expect(result).toEqual([result_0, result_1, result_2]);
     });
 
 });

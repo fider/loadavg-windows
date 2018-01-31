@@ -19,11 +19,11 @@
     "windows"
   ],
   "devDependencies": {
-    "jasmine": "^2.9.0",
+    "jasmine": "2.x",
     "weak-daemon": "file:../weak-daemon"
   },
   "__dependencies": {
-    "weak-daemon": "<2.0.0"
+    "weak-daemon": "1.x"
   },
   "author": "Wojciech Fiderek",
   "license": "MIT"
