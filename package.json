@@ -8,22 +8,25 @@
     "test": "test"
   },
   "scripts": {
-    "test": "jasmine JASMINE_CONFIG_PATH=jasmine.json"
+    "test": "jasmine JASMINE_CONFIG_PATH=jasmine.json",
+    "prepublishOnly": "npm run test"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/fider/loadavg-windows/"
+  },
+  "bugs": {
+    "url": "https://github.com/fider/loadavg-windows/issues"
   },
   "keywords": [
     "loadavg",
     "windows"
   ],
   "devDependencies": {
-    "jasmine": "2.x",
-    "weak-daemon": "file:../weak-daemon"
+    "jasmine": "2.x"
   },
-  "__dependencies": {
-    "weak-daemon": "1.x"
+  "dependencies": {
+    "weak-daemon": "^1.0.3"
   },
   "author": "Wojciech Fiderek",
   "license": "MIT"

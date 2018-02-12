@@ -108,7 +108,7 @@ describe('LoadavgWindows module test', function() {
         {minutes: 114,  busy: 7200,  total: 15000,  load: [1,   0.48, 0] },
 
         {minutes: 115,  busy: 8100,  total: 16000,  load: [0.9, 0.56, 0.5325] },
-        {minutes: 116,  busy: 8400,  total: 17000,  load: [0.3, 0.54, 0.545] }
+        {minutes: 116,  busy: 8400,  total: 17000,  load: [0.3, 0.54, 0.547] }
     ];
 
     CPU_DATA.forEach( sample => {

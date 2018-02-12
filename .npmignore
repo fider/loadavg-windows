@@ -1,3 +1,13 @@
-node_modules
-.gitignore
 .idea
+.vscode
+
+src/
+test/
+node_modules/
+# .map files from .lib
+**/*.map
+
+jasmine.json
+tsconfig.json
+.gitignore
+.npmignore

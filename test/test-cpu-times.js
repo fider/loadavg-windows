@@ -33,10 +33,9 @@ describe('Unit test CpuTimes ->', function() {
 
 
     it('constructor()', function() {
-
         expect(weak_daemon.interval).toEqual(SAMPLING);
-        expect(weak_daemon.routine.name).toEqual(`bound ${cpu_times.update.name}`);
-        expect(weak_daemon.isRunning()).toEqual(false);
+        expect(weak_daemon.task).toBe(cpu_times.update);
+        expect(weak_daemon.isRunning()).toBe(false);
 
         expect(cpu_times._cput_samples).toEqual([]);
         expect(cpu_times._min_age).toBe(MIN_AGE);
@@ -49,12 +48,12 @@ describe('Unit test CpuTimes ->', function() {
 
 
     it('init()', function() {
-        spyOn(weak_daemon, 'start');
+        spyOn(weak_daemon, 'start').and.callThrough();
         cpu_times.init();
 
+        expect(weak_daemon.isRunning()).toEqual(true);
         expect(weak_daemon.start.calls.count()).toBe(1);
         expect(weak_daemon.start).toHaveBeenCalledWith(true);
-
     });
 
 

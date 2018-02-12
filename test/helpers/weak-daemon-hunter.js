@@ -7,14 +7,14 @@ const WeakDaemon = weak_daemon_native.getClass();
 
 class MockWeakDaemon extends WeakDaemon {
     
-    constructor() {
-        super(...arguments);
+    constructor(...args) {
+        super(...args);
         this._started = false;
     }
 
     start(immediate_call = false) {
         if(immediate_call) {
-            this._routine();
+            this._task.apply(this._caller, this._args);
         }
         this._started = true;
     }
@@ -28,7 +28,7 @@ class MockWeakDaemon extends WeakDaemon {
     }
 
     tick() {
-        this._routine();
+        this._task.apply(this._caller, this._args);
     }
 }
 
@@ -57,9 +57,9 @@ class WeakDaemonHunter extends MockMethod {
     };
 
     
-    _captureInstance() {
+    _captureInstance(...args) {
         this._errorIfAlreadyCaptured();
-        this._weak_daemon = new MockWeakDaemon(...arguments);
+        this._weak_daemon = new MockWeakDaemon(...args);
         return this._weak_daemon;
     };
 
