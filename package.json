@@ -1,7 +1,7 @@
 {
   "name": "loadavg-windows",
   "version": "1.0.0",
-  "description": "Plain JS os.loadavg for Windows (currently not supported natively in Node.js)",
+  "description": "Enables os.loadavg for Windows",
   "main": "lib/index.js",
   "directories": {
     "src": "lib",
@@ -20,7 +20,8 @@
   },
   "keywords": [
     "loadavg",
-    "windows"
+    "windows",
+    "win"
   ],
   "devDependencies": {
     "jasmine": "2.x"
