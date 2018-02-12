@@ -1,32 +1,32 @@
-# !
-(2018.01.24): Work in progress... 
-
-
-[TOC] <- todo
-
 # About
-Currently Node.js on Windows platform do not implements `os.loadavg()` functionality (it returns [0,0,0])
+Use `require('loadavg-windows')` to enjoy `os.loadavg()` on Windows OS.
 
-This is pure JavaScript, platform-independent implementation of `os.loadavg()` that can be used on Windows system.
+# Motivation
 
-It uses only `os.cpus()` - details [here](#details)
+Currently Node.js on Windows platform do not implements `os.loadavg()` functionality - it returns `[0,0,0]`
+
+# Important details
+- **Expect first results after 1 min from application start (before 1 min runtime it will return `[0,0.0]`)**
+- **Requiring it on other operatins systems have NO influence.** 
+
+# Usage
+Just one line required to enjoy `os.loadavg()` on Windows OS:
+```node.js
+require('loadavg-windows');
+console.log( os.loadavg() );
+```
 
 # Installation
 Requires [Node.js](https://nodejs.org/) v0.3.3+
 `npm install loadavg-windows`
 
-# Usage
-Just one line required to enjoy `os.loadavg()` on Windows OS:
-```node.js
-require('loadavg-windows')
-```
-**Requiring it on other operatins systems have NO influence.** 
+# Not important details:
 
-# Documentation
-TODO (include notes about 1, 5 and 15min delays)
+This is pure JavaScript, platform-independent implementation of `os.loadavg()` that can be used on Windows system.
 
-# Live demo
-TODO link
+It uses only `os.cpus()` for proper calculations.
 
-# Details
-TODO schema
+# TODO
+- Avg from 1 min should work from start
+- Live demo link
+- Remove warning log when error detected
