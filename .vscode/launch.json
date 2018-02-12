@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Jasmine debug",
+            "name": "Jasmine debug tests",
             "program": "${workspaceRoot}\\node_modules\\jasmine\\bin\\jasmine.js",
             "args": [
                 "test\\**.js"
