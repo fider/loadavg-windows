@@ -11,13 +11,13 @@ Currently Node.js on Windows platform do not implements `os.loadavg()` functiona
 
 # Usage
 Just one line required to enjoy `os.loadavg()` on Windows OS:
-```node.js
+```js
 require('loadavg-windows');
 console.log( os.loadavg() );
 ```
 
 # Installation
-Requires [Node.js](https://nodejs.org/) v0.3.3+
+Requires [Node.js](https://nodejs.org/) v4.8.7
 `npm install loadavg-windows`
 
 # Not important details:
