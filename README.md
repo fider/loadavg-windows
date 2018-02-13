@@ -18,6 +18,7 @@ console.log( os.loadavg() );
 
 # Installation
 Requires [Node.js](https://nodejs.org/) v4.8.7
+
 `npm install loadavg-windows`
 
 # Not important details:
