@@ -47,13 +47,5 @@ describe('Unit test CpuT ->', function() {
         expect( cpu_t.busy ).toEqual(3333);
 
     });
-    
-
-
-    it('_validateArguments()', function() {
-        expect( ()=>{ new CpuT(5.5) } ).toThrowError(TypeError);
-        expect( ()=>{ new CpuT(0) }   ).toThrowError(TypeError);
-        expect( ()=>{ new CpuT(5)}    ).not.toThrow();
-    });
 });
 

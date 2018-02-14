@@ -14,7 +14,7 @@ const custom_matchers = {
 
         return {
             compare(actual, expected, tolerance) {
-                /* 1.95 - 1.94  !=  0.01   so need to work on integers */
+                /* Note that: `1.95 - 1.94  !=  0.01`   so need to work on integers */
                 const FACTOR = Math.pow(10, getPrecision(tolerance));
                 const TOLERANCE = parseInt(tolerance * FACTOR);
                 let result = {

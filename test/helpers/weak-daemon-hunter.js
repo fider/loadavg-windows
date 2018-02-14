@@ -83,7 +83,7 @@ class WeakDaemonHunter extends MockMethod {
                 3) call "instance = hunter.get()"
                 4) call "hunter.stopHunting()"
 
-                If succed then you can:
+                If succeed then you can:
                 - call "${this.constructor.name}.tick()" to call routine assigned to captured weak daemon instance
                 - to get captured instance: "last_instance = ${this.constructor.name}.get()"
                 `);

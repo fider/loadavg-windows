@@ -31,7 +31,7 @@ const not_supported_platforms = [
 
 
 
-describe('loadavg-windows platform support test', function() {
+describe('loadavg-windows platform support test.', function() {
 
 
     beforeAll(function() {
@@ -52,9 +52,9 @@ describe('loadavg-windows platform support test', function() {
 
 
     for(const not_supported of not_supported_platforms) {
-        it(`should not be running on "${not_supported}" platform`, function() {
+        it(`Should not be running on "${not_supported}" platform`, function() {
             platform.set(not_supported);
-
+            
             require('../lib/index');
             expect(os.loadavg).toBe(nativeLoadavg);
         });
@@ -62,10 +62,11 @@ describe('loadavg-windows platform support test', function() {
 
 
     for(const supported of supported_platforms) {
-        it(`should be running on "${supported}" platform`, function() {
+        it(`Should be running on "${supported}" platform`, function() {
             platform.set(supported);            
             latest_log.mock();
             
+            process.env.NODE_ENV = 'development';
             require('../lib/index');
             expect(latest_log.get()).toBe('[loadavg-windows] Using platform-independent loadavg implementation.');
 
@@ -76,9 +77,6 @@ describe('loadavg-windows platform support test', function() {
         });
     }    
 });
-
-
-
 
 
 

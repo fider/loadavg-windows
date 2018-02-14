@@ -17,7 +17,7 @@ class MockDateNow {
         return this._timestamp;
     }
 
-    // no more Date methods needs to be
+    // no more Date methods needs to be mocked
 
 
     

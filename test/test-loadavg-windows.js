@@ -38,7 +38,7 @@ describe('Unit test LoadavgWindows ->', function() {
 
 
 
-    it('_validateArguments()', function() {
+    it('constructor() with invalid arguments', function() {
         const valid_arg = {
             time_period_0: 22,
             time_period_1: 33,
@@ -67,7 +67,7 @@ describe('Unit test LoadavgWindows ->', function() {
     });
 
 
-    it('default constructor()', function() {
+    it('constructor() with default arguments', function() {
         const loadavg_windows_default = new LoadavgWindows;
         const ONE_MINUTE = 60000;
         
@@ -80,7 +80,7 @@ describe('Unit test LoadavgWindows ->', function() {
     });
 
 
-    it('constructor()', function() {       
+    it('constructor() with custom arguments', function() {       
 
         expect(loadavg_windows._loadavg_period_0).toBe(22);
         expect(loadavg_windows._loadavg_period_1).toBe(33);

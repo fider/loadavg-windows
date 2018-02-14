@@ -1,4 +1,4 @@
-const {cpu, time, weak_daemon_hunter} = MOCKS;
+const {cpu, time, weak_daemon_hunter, latest_log} = MOCKS;
 
 const {CpuTimes} = require('../lib/cpu-times');
 const {CpuT} = require('../lib/cput');
@@ -13,7 +13,7 @@ describe('Unit test CpuTimes ->', function() {
 
 
     function getSampleTimes(cpu_times) {
-        return cpu_times._cput_samples.map( cpu_t => cpu_t.timestamp );
+        return cpu_times._cpu_t_samples.map( cpu_t => cpu_t.timestamp );
     }
 
 
@@ -37,7 +37,7 @@ describe('Unit test CpuTimes ->', function() {
         expect(weak_daemon.task).toBe(cpu_times.update);
         expect(weak_daemon.isRunning()).toBe(false);
 
-        expect(cpu_times._cput_samples).toEqual([]);
+        expect(cpu_times._cpu_t_samples).toEqual([]);
         expect(cpu_times._min_age).toBe(MIN_AGE);
 
         // Non-mocked WeakDaemon used
@@ -59,33 +59,83 @@ describe('Unit test CpuTimes ->', function() {
 
 
     it('update()', function() {
-        const cpu_t = new CpuT(123);
-        time.ms(0);
+        let cpu_t = new CpuT(0);
+        cpu_t.total = 100;
+        cpu_t.busy = 10;
 
-        spyOn(CpuT, 'now').and.returnValue(cpu_t);        
+        spyOn(CpuT, 'now').and.callFake( () => cpu_t);
+        spyOn(cpu_times, '_removeExpiredSamples').and.callThrough();
+        spyOn(cpu_times, '_dataConsistencyCheck').and.callThrough();
+        spyOn(cpu_times, '_isTotalCpuLoadIncreased').and.callThrough();
+        spyOn(cpu_times, '_replaceLastSample').and.callThrough();
+        spyOn(cpu_times, '_addSample').and.callThrough();
 
-        spyOn(cpu_times, '_validateNewSample');
-        spyOn(cpu_times, '_removeExpiredSamples');
-        spyOn(cpu_times, '_addSample');
 
-
+        // First call
         cpu_times.update();
+        
+        expect(cpu_times._dataConsistencyCheck).toHaveBeenCalledTimes(1);
+        expect(cpu_times._dataConsistencyCheck.calls.mostRecent().args[0]).toBe(cpu_t);
 
-        time.reset();
-        expect(cpu_times._validateNewSample).toHaveBeenCalledTimes(1);
-        expect(cpu_times._validateNewSample).toHaveBeenCalledWith(cpu_t);
         expect(cpu_times._removeExpiredSamples).toHaveBeenCalledTimes(1);
-        expect(cpu_times._removeExpiredSamples).toHaveBeenCalledWith(cpu_t);
+        expect(cpu_times._removeExpiredSamples.calls.mostRecent().args[0]).toBe(cpu_t);
+
+        expect(cpu_times._isTotalCpuLoadIncreased).toHaveBeenCalledTimes(1);
+        expect(cpu_times._isTotalCpuLoadIncreased.calls.mostRecent().args[0]).toBe(cpu_t);
+
         expect(cpu_times._addSample).toHaveBeenCalledTimes(1);
-        expect(cpu_times._addSample).toHaveBeenCalledWith(cpu_t);
+        expect(cpu_times._addSample.calls.mostRecent().args[0]).toBe(cpu_t);
+
+        expect(cpu_times._replaceLastSample).toHaveBeenCalledTimes(0);
+
+
+        // Second call - with new cpu load info updated
+        cpu_t = new CpuT(200);
+        cpu_t.total = 150;
+        cpu_t.busy = 20;
+        cpu_times.update();
+        
+        expect(cpu_times._dataConsistencyCheck).toHaveBeenCalledTimes(2);
+        expect(cpu_times._dataConsistencyCheck.calls.mostRecent().args[0]).toBe(cpu_t);
+
+        expect(cpu_times._removeExpiredSamples).toHaveBeenCalledTimes(2);
+        expect(cpu_times._removeExpiredSamples.calls.mostRecent().args[0]).toBe(cpu_t);
+
+        expect(cpu_times._isTotalCpuLoadIncreased).toHaveBeenCalledTimes(2);
+        expect(cpu_times._isTotalCpuLoadIncreased.calls.mostRecent().args[0]).toBe(cpu_t);
+
+        expect(cpu_times._addSample).toHaveBeenCalledTimes(2);
+        expect(cpu_times._addSample.calls.mostRecent().args[0]).toBe(cpu_t);
+
+        expect(cpu_times._replaceLastSample).toHaveBeenCalledTimes(0);
+
+
+        // Third call - without cpu load info updated
+        cpu_t = new CpuT(300);
+        cpu_t.total = 150;
+        cpu_t.busy = 20;
+        cpu_times.update();
+        
+        expect(cpu_times._dataConsistencyCheck).toHaveBeenCalledTimes(3);
+        expect(cpu_times._dataConsistencyCheck.calls.mostRecent().args[0]).toBe(cpu_t);
+
+        expect(cpu_times._removeExpiredSamples).toHaveBeenCalledTimes(3);
+        expect(cpu_times._removeExpiredSamples.calls.mostRecent().args[0]).toBe(cpu_t);
+
+        expect(cpu_times._isTotalCpuLoadIncreased).toHaveBeenCalledTimes(3);
+        expect(cpu_times._isTotalCpuLoadIncreased.calls.mostRecent().args[0]).toBe(cpu_t);
+
+        expect(cpu_times._addSample).toHaveBeenCalledTimes(2);
+
+        expect(cpu_times._replaceLastSample).toHaveBeenCalledTimes(1);
+        expect(cpu_times._replaceLastSample.calls.mostRecent().args[0]).toBe(cpu_t);
+
     });
 
 
 
     it('_addSample()', function() {
         expect(getSampleTimes(cpu_times)).toEqual([]);
-
-        // expect( ()=>{ cpu_times._addSample( new CpuT(0) ) } ).toThrowError(TypeError);
         
         cpu_times._addSample( new CpuT(1) );
         expect(getSampleTimes(cpu_times)).toEqual([1]);
@@ -99,13 +149,47 @@ describe('Unit test CpuTimes ->', function() {
     });
 
 
+    
+    it('_replaceLastSample()', function() {
+        expect(getSampleTimes(cpu_times)).toEqual([]);
+        
+        cpu_times._addSample( new CpuT(2) );
+        cpu_times._addSample( new CpuT(4) );
+        cpu_times._addSample( new CpuT(6) );        
+        expect(getSampleTimes(cpu_times)).toEqual([6, 4, 2]);
+        
+        cpu_times._replaceLastSample( new CpuT(7)  );
+        expect(getSampleTimes(cpu_times)).toEqual([7, 4, 2]);
+        
+        cpu_times._addSample( new CpuT(8) );
+        expect(getSampleTimes(cpu_times)).toEqual([8, 7, 4, 2]);
 
-    it('_validateNewSample()', function() {
-        cpu_times._addSample( new CpuT(120) );
+        cpu_times._replaceLastSample( new CpuT(1)  );
+        expect(getSampleTimes(cpu_times)).toEqual([1, 7, 4, 2]);
+    });
 
-        expect( ()=>{ cpu_times._validateNewSample( new CpuT(119) ); } ).toThrowError(Error);
-        expect( ()=>{ cpu_times._validateNewSample( new CpuT(120) ); } ).toThrowError(Error);
-        expect( ()=>{ cpu_times._validateNewSample( new CpuT(121) ); } ).not.toThrow();
+
+        
+    it('_isTotalCpuLoadIncreased()', function() {
+        expect(getSampleTimes(cpu_times)).toEqual([]);
+        
+        let cpu_t = new CpuT(2);
+        cpu_t.total = 10;
+        cpu_times._addSample( cpu_t );
+
+        cpu_t = new CpuT(4);
+        cpu_t.total = 20;
+        cpu_times._addSample( cpu_t );
+
+        cpu_t = new CpuT(6);
+        cpu_t.total = 18;
+        expect(cpu_times._isTotalCpuLoadIncreased(cpu_t)).toBe(false);
+        
+        cpu_t.total = 20;
+        expect(cpu_times._isTotalCpuLoadIncreased(cpu_t)).toBe(false);
+        
+        cpu_t.total = 22;
+        expect(cpu_times._isTotalCpuLoadIncreased(cpu_t)).toBe(true);
     });
 
 
@@ -253,6 +337,65 @@ describe('Unit test CpuTimes ->', function() {
         expect( cputToRaw(cput_at_20) ).toEqual({timestamp:20, busy:210, total:1000}); // -> Predefined sample
         expect( cputToRaw(cput_at_22) ).toEqual({timestamp:22, busy:230, total:1020}); // estimated
         expect( cputToRaw(cput_at_30) ).toEqual({timestamp:30, busy:310, total:1100}); // -> Predefined sample
+    });
+
+
+
+    it('_dataConsistencyCheck()', function() {
+        latest_log.mock();
+
+        let cpu_t = new CpuT(10);
+        cpu_t.total = 100;
+        cpu_t.busy = 20;
+
+        cpu_times._dataConsistencyCheck(cpu_t);
+        expect(latest_log.get()).toBe('');
+        latest_log.clean();
+            
+
+        cpu_times._addSample(cpu_t);
+
+
+        // Invalid timestamp test
+        cpu_t = new CpuT(9);
+        cpu_t.total = 200;
+        cpu_t.busy = 50;
+        cpu_times._dataConsistencyCheck(cpu_t);
+        expect(latest_log.get().substring(0,7)).toBe('Warning');
+        latest_log.clean();
+            
+
+        cpu_t.timestamp = 10;
+        cpu_times._dataConsistencyCheck(cpu_t);
+        expect(latest_log.get().substring(0,7)).toBe('Warning');
+        latest_log.clean();
+            
+
+        cpu_t.timestamp = 11;
+        cpu_times._dataConsistencyCheck(cpu_t);
+        expect(latest_log.get()).toBe('');
+        latest_log.clean();
+
+
+        // Invalid total load test
+        cpu_t = new CpuT(11);
+        cpu_t.total = 99;
+        cpu_times._dataConsistencyCheck(cpu_t);
+        expect(latest_log.get().substring(0,7)).toBe('Warning');
+        latest_log.clean();            
+
+        cpu_t.total = 100;
+        cpu_times._dataConsistencyCheck(cpu_t);
+        expect(latest_log.get()).toBe('');
+        latest_log.clean();            
+
+        cpu_t.total = 101;
+        cpu_times._dataConsistencyCheck(cpu_t);
+        expect(latest_log.get()).toBe('');
+        latest_log.clean();
+
+
+        latest_log.reset();
     });
 
 });

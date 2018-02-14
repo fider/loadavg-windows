@@ -11,14 +11,14 @@ class MockPlatform extends MockMethod {
     }
 
     mock() {
-        super.mock(os, 'platform', this, this._getPlarform)
+        super.mock(os, 'platform', this, this._getPlatform)
     }
 
     set(platform) {        
         this._platform = platform;
     }
 
-    _getPlarform() {
+    _getPlatform() {
         return this._platform;
     }
 }
