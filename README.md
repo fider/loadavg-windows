@@ -28,6 +28,5 @@ This is pure JavaScript, platform-independent implementation of `os.loadavg()` t
 It uses only `os.cpus()` for proper calculations.
 
 # TODO
-- Avg from 1 min should work from start
+- loadavg()[0] results before first minute of runtime 
 - Live demo link
-- Remove warning log when error detected
