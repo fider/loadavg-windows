@@ -1,3 +1,9 @@
+<!--
+  Title: Loadavg-windows
+  Description: Node.js module that enables os.loadavg() on Windows OS
+  Author: fider
+  -->
+
 # About
 Use `require('loadavg-windows')` to enjoy `os.loadavg()` on Windows OS.
 
