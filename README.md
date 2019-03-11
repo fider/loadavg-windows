@@ -13,9 +13,9 @@ Currently Node.js on Windows platform do not implements `os.loadavg()` functiona
 
 # Important details
 - os.loadavg\(\) returns [**A**, **B**, **C**]
-  A - expect value different than 0 **after few seconds**.
-  B - expect value different than 0 after first **5 minutes**.
-  C - expect value different than 0 after first **15 minutes**.
+  - A - expect value different than 0 **after few seconds**.
+  - B - expect value different than 0 after first **5 minutes**.
+  - C - expect value different than 0 after first **15 minutes**.
 - **Requiring it on other operating systems have NO influence,**
   unless `require('loadavg-windows').enableCustomLoadavg()` called manually.
 
