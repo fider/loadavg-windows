@@ -1,7 +1,6 @@
 const os = require('os');
 const nativeLoadavg = os.loadavg;
 const ok = require('assert');
-const {inspect:insp} = require('util');
 const CPUS_LEN = os.cpus().length;
 
 const {
@@ -54,7 +53,7 @@ describe('loadavg-windows platform support test.', function() {
     for(const not_supported of not_supported_platforms) {
         it(`Should not be running on "${not_supported}" platform`, function() {
             platform.set(not_supported);
-            
+
             require('../lib/index');
             expect(os.loadavg).toBe(nativeLoadavg);
         });
@@ -63,19 +62,13 @@ describe('loadavg-windows platform support test.', function() {
 
     for(const supported of supported_platforms) {
         it(`Should be running on "${supported}" platform`, function() {
-            platform.set(supported);            
-            latest_log.mock();
-            
+            platform.set(supported);
+
             process.env.NODE_ENV = 'development';
             require('../lib/index');
-            expect(latest_log.get()).toBe('[loadavg-windows] Using platform-independent loadavg implementation.');
-
-            latest_log.reset();
-            latest_log.clean();
-
             expect(os.loadavg).not.toBe(nativeLoadavg);
         });
-    }    
+    }
 });
 
 
@@ -85,9 +78,9 @@ describe('LoadavgWindows module test', function() {
     let weak_daemon = null;
     let loadavg_win = null;
 
-
+    // (!) os.loadavg is CPU_DATA[i].load multiplied by number of logical cores
     const CPU_DATA = [
-        {minutes: 100,  busy:  100,  total:  1000,  load: [0,   0, 0] },
+        {minutes: 100,  busy:  100,  total:  1000,  load: [0.25, 0, 0] },
         {minutes: 101,  busy:  200,  total:  2000,  load: [0.1, 0, 0] },
         {minutes: 102,  busy:  800,  total:  3000,  load: [0.6, 0, 0] },
         {minutes: 103,  busy: 1200,  total:  4000,  load: [0.4, 0, 0] },
@@ -109,11 +102,13 @@ describe('LoadavgWindows module test', function() {
         {minutes: 116,  busy: 8400,  total: 17000,  load: [0.3, 0.54, 0.547] }
     ];
 
+    // os.loadavg result depends on number of logical cores.
+    // Below is required, so test may be performed on any machine
     CPU_DATA.forEach( sample => {
         sample.load = sample.load.map( load => parseInt(100 * load * CPUS_LEN)/100 );
     });
 
-    
+
     let prev_sample_num = 0;
 
     function loadSample(sample_num) {
@@ -128,7 +123,7 @@ describe('LoadavgWindows module test', function() {
         time.min(minutes);
         cpu.busy(busy).total(total);
         weak_daemon.tick();
-        
+
         prev_sample_num = sample_num;
     }
 
@@ -146,7 +141,7 @@ describe('LoadavgWindows module test', function() {
         delete require.cache[require.resolve('../lib/index')];
 
         platform.mock();
-        latest_log.mock();        
+        // latest_log.mock();
         weak_daemon_hunter.startHunting();
 
         let {minutes, busy, total} = CPU_DATA[0];
@@ -159,11 +154,10 @@ describe('LoadavgWindows module test', function() {
 
         weak_daemon = weak_daemon_hunter.get();
 
-
         time.reset();
         cpu.reset();
         platform.reset();
-        latest_log.reset();
+        // latest_log.reset();
         weak_daemon_hunter.stopHunting();
     });
 
@@ -185,23 +179,47 @@ describe('LoadavgWindows module test', function() {
     it('initialization test', function() {
         // Same test should be done while testing class LoadavgWindows
         const ONE_MINUTE = 60000;
-        
-        expect(loadavg_win._loadavg_period_0).toBe(ONE_MINUTE);        
+
+        expect(loadavg_win._loadavg_period_0).toBe(ONE_MINUTE);
         expect(loadavg_win._loadavg_period_1).toBe(ONE_MINUTE * 5);
         expect(loadavg_win._loadavg_period_2).toBe(ONE_MINUTE * 15);
 
         expect(loadavg_win._sampling_interval).toBe(ONE_MINUTE);
-        expect(loadavg_win._min_sample_age).toBe(ONE_MINUTE * 15);      
+        expect(loadavg_win._min_sample_age).toBe(ONE_MINUTE * 15);
     });
 
 
+    it('runtime simulation before 1 min runtime', function() {
+
+        function verify(reslativeBusy, relativeTotal, relativeTimeS) {
+
+            if (relativeTimeS >= 60) {
+                throw new Error(`Invalid test code. Expected relativeTimeS < 60. Actual=${relativeTimeS}`);
+            }
+
+            time.min( CPU_DATA[0].minutes ).sec(relativeTimeS);
+
+            let busy  = CPU_DATA[0].busy  + reslativeBusy;
+            let total = CPU_DATA[0].total + relativeTotal;
+            cpu.busy( busy ).total( total );
+            let expected = [reslativeBusy/relativeTotal, 0, 0].map( load => parseInt(100 * load * CPUS_LEN)/100 );
+
+            let result = os.loadavg();
+
+            expect(result).toEqual(expected);
+        }
+
+        expected = verify(1, 4, 10);
+        expected = verify(1, 4, 40);
+        expected = verify(5, 5, 15);
+        expected = verify(5, 10, 15);
+
+        // This test case checks only calculations (load will be greater than possible because of input data used)
+        expected = verify(6, 5, 15);
+    });
+
 
     it('runtime simulation', function() {
-
-        time.min( CPU_DATA[0].minutes ).sec(59);
-        let result = os.loadavg();
-        expect(result).toEqual(CPU_DATA[0].load);
-
 
 
         loadSample(1);
@@ -255,13 +273,13 @@ describe('LoadavgWindows module test', function() {
         loadSample(9);
         result = os.loadavg();
         expect(result).toEqual(CPU_DATA[9].load);
-         
+
         loadSample(10);
         result = os.loadavg();
         expect(result).toEqual(CPU_DATA[10].load);
 
-        
-        
+
+
         time.min(CPU_DATA[10].minutes).sec(48);
         cpu.busy(5310).total(11160);
         result_0 = computeLoad(110, 360);
@@ -294,12 +312,12 @@ describe('LoadavgWindows module test', function() {
         loadSample(15);
         result = os.loadavg();
         expect(result).toEqual(CPU_DATA[15].load);
-        
+
         loadSample(16);
         result = os.loadavg();
         expect(result).toEqual(CPU_DATA[16].load);
 
-        
+
 
         time.min(CPU_DATA[16].minutes).sec(36);
         cpu.busy(8520).total(17920);

@@ -1,7 +1,7 @@
 {
   "name": "loadavg-windows",
-  "version": "1.0.2",
-  "description": "Enables os.loadavg for Windows",
+  "version": "1.1.0",
+  "description": "Enables os.loadavg for Windows (and optionally any other OS)",
   "main": "lib/index.js",
   "directories": {
     "src": "lib",
@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "jasmine JASMINE_CONFIG_PATH=jasmine.json",
+    "test:runtime": "node ./test/runtime-test.js",
     "prepublishOnly": "npm run test"
   },
   "repository": {
@@ -24,10 +25,12 @@
     "win"
   ],
   "devDependencies": {
+    "chart.js": "2.7.3",
+    "express": "4.16.4",
     "jasmine": "2.x"
   },
   "dependencies": {
-    "weak-daemon": "^1.0.3"
+    "weak-daemon": "1.0.3"
   },
   "author": "Wojciech Fiderek",
   "license": "MIT"

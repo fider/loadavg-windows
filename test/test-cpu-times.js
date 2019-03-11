@@ -29,7 +29,7 @@ describe('Unit test CpuTimes ->', function() {
         cpu.reset();
         time.reset();
     });
-    
+
 
 
     it('constructor()', function() {
@@ -73,7 +73,7 @@ describe('Unit test CpuTimes ->', function() {
 
         // First call
         cpu_times.update();
-        
+
         expect(cpu_times._dataConsistencyCheck).toHaveBeenCalledTimes(1);
         expect(cpu_times._dataConsistencyCheck.calls.mostRecent().args[0]).toBe(cpu_t);
 
@@ -94,7 +94,7 @@ describe('Unit test CpuTimes ->', function() {
         cpu_t.total = 150;
         cpu_t.busy = 20;
         cpu_times.update();
-        
+
         expect(cpu_times._dataConsistencyCheck).toHaveBeenCalledTimes(2);
         expect(cpu_times._dataConsistencyCheck.calls.mostRecent().args[0]).toBe(cpu_t);
 
@@ -115,7 +115,7 @@ describe('Unit test CpuTimes ->', function() {
         cpu_t.total = 150;
         cpu_t.busy = 20;
         cpu_times.update();
-        
+
         expect(cpu_times._dataConsistencyCheck).toHaveBeenCalledTimes(3);
         expect(cpu_times._dataConsistencyCheck.calls.mostRecent().args[0]).toBe(cpu_t);
 
@@ -136,31 +136,31 @@ describe('Unit test CpuTimes ->', function() {
 
     it('_addSample()', function() {
         expect(getSampleTimes(cpu_times)).toEqual([]);
-        
+
         cpu_times._addSample( new CpuT(1) );
         expect(getSampleTimes(cpu_times)).toEqual([1]);
-        
+
         cpu_times._addSample( new CpuT(4) );
         expect(getSampleTimes(cpu_times)).toEqual([4,1]);
-        
+
         cpu_times._addSample( new CpuT(3)  );
         cpu_times._addSample( new CpuT(20) );
         expect(getSampleTimes(cpu_times)).toEqual([20, 3, 4, 1]);
     });
 
 
-    
+
     it('_replaceLastSample()', function() {
         expect(getSampleTimes(cpu_times)).toEqual([]);
-        
+
         cpu_times._addSample( new CpuT(2) );
         cpu_times._addSample( new CpuT(4) );
-        cpu_times._addSample( new CpuT(6) );        
+        cpu_times._addSample( new CpuT(6) );
         expect(getSampleTimes(cpu_times)).toEqual([6, 4, 2]);
-        
+
         cpu_times._replaceLastSample( new CpuT(7)  );
         expect(getSampleTimes(cpu_times)).toEqual([7, 4, 2]);
-        
+
         cpu_times._addSample( new CpuT(8) );
         expect(getSampleTimes(cpu_times)).toEqual([8, 7, 4, 2]);
 
@@ -169,10 +169,10 @@ describe('Unit test CpuTimes ->', function() {
     });
 
 
-        
+
     it('_isTotalCpuLoadIncreased()', function() {
         expect(getSampleTimes(cpu_times)).toEqual([]);
-        
+
         let cpu_t = new CpuT(2);
         cpu_t.total = 10;
         cpu_times._addSample( cpu_t );
@@ -184,10 +184,10 @@ describe('Unit test CpuTimes ->', function() {
         cpu_t = new CpuT(6);
         cpu_t.total = 18;
         expect(cpu_times._isTotalCpuLoadIncreased(cpu_t)).toBe(false);
-        
+
         cpu_t.total = 20;
         expect(cpu_times._isTotalCpuLoadIncreased(cpu_t)).toBe(false);
-        
+
         cpu_t.total = 22;
         expect(cpu_times._isTotalCpuLoadIncreased(cpu_t)).toBe(true);
     });
@@ -204,7 +204,7 @@ describe('Unit test CpuTimes ->', function() {
         let samples = [10, 11, 12, 13, 20, 30, 40, 50];
         samples.forEach( sample => cpu_times._addSample( new CpuT( sample ) ) );
         samples.reverse();
-        
+
         // Nothing removed
         cpu_times._removeExpiredSamples( new CpuT(15) );
         cpu_times._removeExpiredSamples( new CpuT(19) );
@@ -212,7 +212,7 @@ describe('Unit test CpuTimes ->', function() {
 
         cpu_times._removeExpiredSamples( new CpuT(20) );
         expect(getSampleTimes(cpu_times)).toEqual(samples);
-        
+
         cpu_times._removeExpiredSamples( new CpuT(21) );
         samples.pop(); // 11, ...
         expect(getSampleTimes(cpu_times)).toEqual(samples);
@@ -220,7 +220,7 @@ describe('Unit test CpuTimes ->', function() {
         cpu_times._removeExpiredSamples( new CpuT(22) );
         samples.pop(); // 12, ...
         expect(getSampleTimes(cpu_times)).toEqual(samples);
-        
+
         cpu_times._removeExpiredSamples( new CpuT(25) );
         samples.pop(); // 13, ...
         expect(getSampleTimes(cpu_times)).toEqual(samples);
@@ -253,7 +253,7 @@ describe('Unit test CpuTimes ->', function() {
         cpu_times._addSample(cput_18);
 
 
-        expect(cpu_times._findOlderOrEqualNeighbour( 5 )).toBe( undefined ); 
+        expect(cpu_times._findOlderOrEqualNeighbour( 5 )).toBe( undefined );
 
         expect(cpu_times._findOlderOrEqualNeighbour(  7 )).toBe( cput_7 );
         expect(cpu_times._findOlderOrEqualNeighbour( 10 )).toBe( cput_7 );
@@ -318,7 +318,7 @@ describe('Unit test CpuTimes ->', function() {
             cpu_t.total = total;
             cpu_times._addSample( cpu_t );
         });
-        
+
 
         const cput_at_9  = cpu_times.cputAt(9, current_cput);
         const cput_at_10 = cpu_times.cputAt(10, current_cput);
@@ -351,7 +351,7 @@ describe('Unit test CpuTimes ->', function() {
         cpu_times._dataConsistencyCheck(cpu_t);
         expect(latest_log.get()).toBe('');
         latest_log.clean();
-            
+
 
         cpu_times._addSample(cpu_t);
 
@@ -363,13 +363,13 @@ describe('Unit test CpuTimes ->', function() {
         cpu_times._dataConsistencyCheck(cpu_t);
         expect(latest_log.get().substring(0,7)).toBe('Warning');
         latest_log.clean();
-            
+
 
         cpu_t.timestamp = 10;
         cpu_times._dataConsistencyCheck(cpu_t);
         expect(latest_log.get().substring(0,7)).toBe('Warning');
         latest_log.clean();
-            
+
 
         cpu_t.timestamp = 11;
         cpu_times._dataConsistencyCheck(cpu_t);
@@ -382,12 +382,12 @@ describe('Unit test CpuTimes ->', function() {
         cpu_t.total = 99;
         cpu_times._dataConsistencyCheck(cpu_t);
         expect(latest_log.get().substring(0,7)).toBe('Warning');
-        latest_log.clean();            
+        latest_log.clean();
 
         cpu_t.total = 100;
         cpu_times._dataConsistencyCheck(cpu_t);
         expect(latest_log.get()).toBe('');
-        latest_log.clean();            
+        latest_log.clean();
 
         cpu_t.total = 101;
         cpu_times._dataConsistencyCheck(cpu_t);
