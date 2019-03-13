@@ -47,3 +47,11 @@ This is pure JavaScript, platform-independent implementation of `os.loadavg()` t
 (or any other system that for some reasons do not supports loadavg)
 
 It uses only `os.cpus()` for proper calculations.
+
+
+# Test of version loadavg-windows@1.1.1
+
+- First chart demonstrates results during 4h runtime with sample every 21 seconds.
+- Second chart is to check for memory leaks. Memory consumption includes also http server (no memory leaks).
+
+![image](https://raw.githubusercontent.com/fider/loadavg-windows/master/test/runtime-test-v.1.1.1.png)
